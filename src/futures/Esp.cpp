@@ -60,7 +60,7 @@ void Esp::drawESP()
 
             // pos
             Vec3 feetpos = *(Vec3*)(pCSPlayerPawnPtr + Offsets::C_BasePlayerPawn::m_vOldOrigin);
-            Vec3 headpos = { feetpos.x + 0.0f, feetpos.y + 0.0f, feetpos.z + 65.0f };
+            Vec3 headpos = { feetpos.x + 0.0f, feetpos.y + 0.0f, feetpos.z + 73.0f };
 
             Vec2 feet, head;
             if (showDebugMenu) {
@@ -76,46 +76,43 @@ void Esp::drawESP()
                     ImGui::GetForegroundDrawList()->AddText(ImVec2(feet.x - width / 2, head.y - 12), ImColor(245, 223, 222), entityName.c_str());
                 }
 
+                float barPadding = 2.0f;
+                float barWidth = 7.0f;
+
+                // Health bar
                 if (showHealth) {
-                    // Draw gradient health bar (fixed height, independent of current health)
-                    float barWidth = 4.0f;
-                    float totalBarHeight = fabsf(feet.y - head.y);
-                    float barX = feet.x - width / 2 - barWidth - 2; // left of box
-                    float barBottomY = feet.y;
-                    float barTopY = feet.y - totalBarHeight;
-
-                    int steps = (int)totalBarHeight;
-                    for (int i = 0; i < steps; i++) {
-                        float t = (float)i / steps; // 0.0 (bottom) → 1.0 (top)
-                        // Interpolate color: green at top, red at bottom
-                        ImU32 col = ImColor(
-                            (int)(255 * (1.0f - t)), // red increases toward bottom
-                            (int)(255 * t),          // green decreases toward bottom
-                            0
-                        );
-                        ImGui::GetForegroundDrawList()->AddRectFilled(
-                            ImVec2(barX, barBottomY - i - 1),
-                            ImVec2(barX + barWidth, barBottomY - i),
-                            col
-                        );
-                    }
-
-                    // Draw grey overlay for missing health
-                    float healthPercent = health / 100.0f;
-                    float filledHeight = totalBarHeight * healthPercent; // height of current health
-                    ImGui::GetForegroundDrawList()->AddRectFilled(
-                        ImVec2(barX, barTopY),
-                        ImVec2(barX + barWidth, barBottomY - filledHeight),
-                        ImColor(50, 50, 50, 200) // semi-transparent grey
-                    );
-
-                    // Optional outline
-                    ImGui::GetForegroundDrawList()->AddRect(
-                        ImVec2(barX, barTopY),
-                        ImVec2(barX + barWidth, barBottomY),
-                        ImColor(100, 100, 100)
+                    Esp::drawVerticalBar(
+                        feet.x - width / 2 - barWidth, // barX
+                        feet.y,
+                        fabsf(feet.y - head.y),
+                        barWidth,
+                        health, 100,
+                        ImColor(0, 255, 0),
+                        ImColor(255, 0, 0),
+                        ImColor(50, 50, 50, 200),
+                        ImColor(100, 100, 100),
+                        ImColor(255, 255, 255),
+                        barPadding
                     );
                 }
+
+                // Armor bar
+                if (showArmor) {
+                    Esp::drawVerticalBar(
+                        feet.x - width / 2 - barWidth - barWidth - barPadding, // barX (next to health)
+                        feet.y,
+                        fabsf(feet.y - head.y),
+                        barWidth,
+                        armor, 100,
+                        ImColor(0, 255, 0),
+                        ImColor(0, 0, 255),
+                        ImColor(50, 50, 50, 200),
+                        ImColor(100, 100, 100),
+                        ImColor(0, 200, 255),
+                        barPadding
+                    );
+                }
+
             }
         }
     }
@@ -129,5 +126,64 @@ void Esp::drawSettings()
         ImGui::Checkbox("Show Debug Menu", &showDebugMenu);
         ImGui::Checkbox("Show Name", &showName);
         ImGui::Checkbox("Show Health", &showHealth);
+        ImGui::Checkbox("Show Armor", &showArmor);
     }
+}
+
+void Esp::drawVerticalBar(float barX, float barBottomY, float totalHeight, float barWidth, int value, int maxValue,
+    ImColor topColor, ImColor bottomColor, ImColor bgColor, ImColor outlineColor, ImColor textColor, float padding)
+{
+    // Adjust barX for padding
+    barX += padding;
+
+    int steps = (int)totalHeight;
+    for (int i = 0; i < steps; i++) {
+        float t = (float)i / steps;
+        ImU32 col = ImColor(
+            (int)((1.0f - t) * topColor.Value.x * 255 + t * bottomColor.Value.x * 255),
+            (int)((1.0f - t) * topColor.Value.y * 255 + t * bottomColor.Value.y * 255),
+            (int)((1.0f - t) * topColor.Value.z * 255 + t * bottomColor.Value.z * 255)
+        );
+        ImGui::GetForegroundDrawList()->AddRectFilled(
+            ImVec2(barX, barBottomY - i - 1),
+            ImVec2(barX + barWidth, barBottomY - i),
+            col
+        );
+    }
+
+    // Grey overlay for missing value
+    float percent = value / (float)maxValue;
+    float filledHeight = totalHeight * percent;
+    ImGui::GetForegroundDrawList()->AddRectFilled(
+        ImVec2(barX, barBottomY - totalHeight),
+        ImVec2(barX + barWidth, barBottomY - filledHeight),
+        bgColor
+    );
+
+    // Outline of full bar
+    ImGui::GetForegroundDrawList()->AddRect(
+        ImVec2(barX, barBottomY - totalHeight),
+        ImVec2(barX + barWidth, barBottomY),
+        outlineColor
+    );
+
+    // Outline of current filled portion
+    ImGui::GetForegroundDrawList()->AddRect(
+        ImVec2(barX, barBottomY - filledHeight),
+        ImVec2(barX + barWidth, barBottomY),
+        textColor
+    );
+
+    // Text that follows current value, centered
+    std::string text = std::to_string(value);
+    ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+    float textX = barX + (barWidth - textSize.x) / 2;
+    float textY = barBottomY - filledHeight - textSize.y - 2;
+
+    ImGui::GetForegroundDrawList()->AddText(
+        ImVec2(textX, textY),
+        textColor,
+        text.c_str()
+    );
+
 }

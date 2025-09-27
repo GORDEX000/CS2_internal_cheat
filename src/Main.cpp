@@ -11,7 +11,9 @@ ID3D11RenderTargetView* mainRenderTargetView = nullptr;
 bool init = false;
 
 // hide the menu
+int g_toggleKey = VK_INSERT;
 bool g_ShowMenu = true;
+
 Esp esp;
 
 void InitImGui()
@@ -86,7 +88,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
             return oPresent(pSwapChain, SyncInterval, Flags);
     }
 
-    if (GetAsyncKeyState(VK_INSERT) & 1)
+    // Toggle menu by insert key
+    if (GetAsyncKeyState(g_toggleKey) & 1)
     {
         g_ShowMenu = !g_ShowMenu;
     }
@@ -95,13 +98,34 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
+    if (g_ShowMenu) {
+        // Menu default Size
+        ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin("LOLZCheat");
-    esp.drawSettings();
+        // Menu Name
+        ImGui::Begin("LOLZCheat");
 
-    ImGui::End();
+        if (ImGui::BeginTabBar("MainTabs"))
+        {
+            if (ImGui::BeginTabItem("ESP"))
+            {
+                esp.drawSettings();
+                ImGui::EndTabItem();
+            }
 
+            if (ImGui::BeginTabItem("Aimbot"))
+            {
+                //aimbot.drawSettings();
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+
+
+        ImGui::End();
+    }
 
     esp.drawESP();
     ImGui::Render();
