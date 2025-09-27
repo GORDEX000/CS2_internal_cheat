@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "E:\\My codes\\Cheats\\CS2_internal_cheat\\build\\intermediates\\includes.h.obj",
+            "outputs": [
+                "E:\\My codes\\Cheats\\CS2_internal_cheat\\build\\intermediates\\vc143.pdb",
+                "E:\\My codes\\Cheats\\CS2_internal_cheat\\build\\intermediates\\",
+                "E:\\My codes\\Cheats\\CS2_internal_cheat\\build\\intermediates\\includes.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "src\\includes.h",
+                    "source-path": "e:\\my codes\\cheats\\cs2_internal_cheat\\src\\includes.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}
