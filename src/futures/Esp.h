@@ -1,7 +1,6 @@
 #pragma once
 #include "../includes.h"
-#include "../render.h"
-#include "./Bones.h"
+
 
 class Esp
 {
