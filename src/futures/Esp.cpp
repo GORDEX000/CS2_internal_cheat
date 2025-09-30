@@ -7,13 +7,13 @@ void Esp::drawESP()
 
     if (enabled) {
 
-        float(*ViewMatrix)[4][4] = (float(*)[4][4])(client + Offsets::ClientDll::dwViewMatrix);
+        float(*ViewMatrix)[4][4] = (float(*)[4][4])(client + Offsets::dwViewMatrix);
 
-        auto localPawn = *(uintptr_t*)(client + Offsets::ClientDll::dwLocalPlayerPawn);
+        auto localPawn = *(uintptr_t*)(client + Offsets::dwLocalPlayerPawn);
         if (!localPawn)
             return;
 
-        auto entityList = *(uintptr_t*)(client + Offsets::ClientDll::dwEntityList);
+        auto entityList = *(uintptr_t*)(client + Offsets::dwEntityList);
 
         for (int i = 1; i < 64; i++) {
             uintptr_t list_entry1 = *(uintptr_t*)(entityList + (8 * (i & 0x7FFF) >> 9) + 16);
@@ -24,7 +24,7 @@ void Esp::drawESP()
             if (!playerController)
                 continue;
 
-            uint32_t playerPawn = *(uint32_t*)(playerController + Offsets::CCSPlayerController::m_hPlayerPawn);
+            uint32_t playerPawn = *(uint32_t*)(playerController + Offsets::m_hPlayerPawn);
             if (!playerPawn)
                 continue;
 
@@ -39,27 +39,27 @@ void Esp::drawESP()
             if (pCSPlayerPawnPtr == localPawn)
                 continue;
 
-            auto localTeam = *(int*)(localPawn + Offsets::C_BaseEntity::m_iTeamNum);
+            auto localTeam = *(int*)(localPawn + Offsets::m_iTeamNum);
 
             // skip teammates
-            int playerTeam = *(int*)(pCSPlayerPawnPtr + Offsets::C_BaseEntity::m_iTeamNum);
+            int playerTeam = *(int*)(pCSPlayerPawnPtr + Offsets::m_iTeamNum);
             if (playerTeam == localTeam)
                 continue;
 
             // Name
-            char* namePtr = *(char**)(playerController + Offsets::CCSPlayerController::m_sSanitizedPlayerName);
+            char* namePtr = *(char**)(playerController + Offsets::m_sSanitizedPlayerName);
             std::string entityName = namePtr ? std::string(namePtr) : "Unknown";
 
             // health
-            int health = *(int*)(pCSPlayerPawnPtr + Offsets::C_BaseEntity::m_iHealth);
+            int health = *(int*)(pCSPlayerPawnPtr + Offsets::m_iHealth);
             if (!health || health > 100)
                 continue;
 
             // armor
-            int armor = *(int*)(pCSPlayerPawnPtr + Offsets::C_CSPlayerPawn::m_ArmorValue);
+            int armor = *(int*)(pCSPlayerPawnPtr + Offsets::m_ArmorValue);
 
             // pos
-            Vec3 feetpos = *(Vec3*)(pCSPlayerPawnPtr + Offsets::C_BasePlayerPawn::m_vOldOrigin);
+            Vec3 feetpos = *(Vec3*)(pCSPlayerPawnPtr + Offsets::m_vOldOrigin);
             Vec3 headpos = { feetpos.x + 0.0f, feetpos.y + 0.0f, feetpos.z + 73.0f };
 
             Vec2 feet, head;
@@ -87,8 +87,8 @@ void Esp::drawESP()
                         fabsf(feet.y - head.y),
                         barWidth,
                         health, 100,
-                        ImColor(0, 255, 0),
                         ImColor(255, 0, 0),
+                        ImColor(0, 255, 0),
                         ImColor(50, 50, 50, 200),
                         ImColor(100, 100, 100),
                         ImColor(255, 255, 255),
@@ -104,7 +104,7 @@ void Esp::drawESP()
                         fabsf(feet.y - head.y),
                         barWidth,
                         armor, 100,
-                        ImColor(0, 255, 0),
+                        ImColor(196, 76, 2),
                         ImColor(0, 0, 255),
                         ImColor(50, 50, 50, 200),
                         ImColor(100, 100, 100),

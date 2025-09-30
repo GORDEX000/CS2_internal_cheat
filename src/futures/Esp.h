@@ -1,5 +1,7 @@
 #pragma once
 #include "../includes.h"
+#include "../render.h"
+#include "./Bones.h"
 
 class Esp
 {
@@ -9,7 +11,7 @@ public:
 
 private:
 	void drawVerticalBar(float barX, float barBottomY, float totalHeight, float barWidth, int value, int maxValue,
-		ImColor topColor, ImColor bottomColor, ImColor bgColor = ImColor(50, 50, 50, 200), ImColor outlineColor = ImColor(100, 100, 100), ImColor textColor = ImColor(255, 255, 255), float padding = 2.0f);
+		ImColor topColor, ImColor bottomColor, ImColor bgColor, ImColor outlineColor, ImColor textColor, float padding);
 
 	static uintptr_t client;
 
