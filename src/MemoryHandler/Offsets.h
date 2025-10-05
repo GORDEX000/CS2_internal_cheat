@@ -4,9 +4,9 @@
 
 namespace Offsets
 {
-	static constexpr uintptr_t dwEntityList = 0x1D042D8;
-	static constexpr uintptr_t dwLocalPlayerPawn = 0x1BDFD10;
-	static constexpr uintptr_t dwViewMatrix = 0x1E21090;
+	static constexpr uintptr_t dwEntityList = 0x1D16758;
+	static constexpr uintptr_t dwLocalPlayerPawn = 0x1BF1FA0;
+	static constexpr uintptr_t dwViewMatrix = 0x1E339D0;
 	static constexpr uintptr_t m_hPlayerPawn = 0x8FC;
 	static constexpr uintptr_t m_iTeamNum = 0x3EB;
 	static constexpr uintptr_t m_sSanitizedPlayerName = 0x850;
